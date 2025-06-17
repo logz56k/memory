@@ -1,10 +1,9 @@
-This folder stores sound samples used by SynthLAN. Because binary
-files are not included, each sample is available as a `[name].wav.txt`
-file. Convert these text files back into `.wav` files before running
-the program. Replace them with your own synth tones or loops if
-desired.
+This folder should contain four MP3 tracks used by SynthLAN. Add files
+named `low.mp3`, `medium.mp3`, `high.mp3`, and `error.mp3`. These files
+are not stored in the repository; place your own synthwave loops here
+before running the program.
 
-low_traffic.wav    - Played during low network usage.
-medium_traffic.wav - Played when network usage increases.
-high_traffic.wav   - Played at high network activity.
-error.wav          - Triggered on spikes or drops.
+low.mp3    - Played during low network usage.
+medium.mp3 - Played when network usage increases.
+high.mp3   - Played at high network activity.
+error.mp3  - Triggered on spikes or drops.
