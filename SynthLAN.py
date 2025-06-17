@@ -3,6 +3,7 @@ import time
 import argparse
 import psutil
 import pygame
+from collections import deque
 
 # SynthLAN: an audio-driven network feedback system
 # Inspired by the synthwave aesthetic of Com Truise
@@ -23,8 +24,10 @@ class SynthLAN:
         }
         self._load_assets()
         self.current_level = None
-        self.channel = None
+        self.loop_channel = None
+        self.error_channel = None
         self.prev_total = 0
+        self.history = deque(maxlen=10)
 
     def _load_sound(self, name):
         path = os.path.join(self.assets_dir, name)
@@ -44,11 +47,15 @@ class SynthLAN:
             self.audio_enabled = False
             self.sounds = {}
             return
+
+        self.loop_channel = pygame.mixer.Channel(0)
+        self.error_channel = pygame.mixer.Channel(1)
+
         self.sounds = {
-            'low': self._load_sound('low_traffic.wav'),
-            'medium': self._load_sound('medium_traffic.wav'),
-            'high': self._load_sound('high_traffic.wav'),
-            'error': self._load_sound('error.wav')
+            'low': self._load_sound('low.mp3'),
+            'medium': self._load_sound('medium.mp3'),
+            'high': self._load_sound('high.mp3'),
+            'error': self._load_sound('error.mp3')
         }
 
     def _play_loop(self, level):
@@ -57,11 +64,10 @@ class SynthLAN:
             return
         if self.current_level == level:
             return
-        if self.channel:
-            self.channel.stop()
         snd = self.sounds.get(level)
         if snd:
-            self.channel = snd.play(loops=-1)
+            self.loop_channel.stop()
+            self.loop_channel.play(snd, loops=-1)
         self.current_level = level
 
     def _play_once(self, key):
@@ -69,7 +75,7 @@ class SynthLAN:
             return
         snd = self.sounds.get(key)
         if snd:
-            snd.play()
+            self.error_channel.play(snd)
 
     def _meter_bar(self, value, width=30):
         max_val = self.thresholds['high']
@@ -89,24 +95,27 @@ class SynthLAN:
                 total = sent + recv
                 prev = curr
 
-                if total <= self.thresholds['low']:
+                self.history.append(total)
+                avg_total = sum(self.history) / len(self.history)
+
+                if avg_total <= self.thresholds['low']:
                     level = 'low'
-                elif total <= self.thresholds['medium']:
+                elif avg_total <= self.thresholds['medium']:
                     level = 'medium'
                 else:
                     level = 'high'
 
                 self._play_loop(level)
 
-                # Detect spikes or drops
+                # Detect spikes or drops using instant traffic
                 if self.prev_total and (
                     total == 0 or total > self.prev_total * 5
                 ):
                     self._play_once('error')
                 self.prev_total = total
 
-                bar = self._meter_bar(total)
-                print(f"Traffic: {total:8d} B/s {bar} level: {level}   ", end='\r')
+                bar = self._meter_bar(avg_total)
+                print(f"Traffic: {avg_total:8.0f} B/s {bar} level: {level}   ", end='\r')
         except KeyboardInterrupt:
             print("\nStopping SynthLAN...")
         finally:
@@ -116,7 +125,7 @@ class SynthLAN:
 
 def parse_args():
     p = argparse.ArgumentParser(description="SynthLAN - synthwave network feedback")
-    p.add_argument('--assets', default='assets', help='Path to assets folder with wav files')
+    p.add_argument('--assets', default='assets', help='Path to assets folder with mp3 files')
     p.add_argument('--low', type=int, default=1024, help='Threshold for low traffic (bytes/s)')
     p.add_argument('--medium', type=int, default=10240, help='Threshold for medium traffic')
     p.add_argument('--high', type=int, default=51200, help='Threshold for high traffic')

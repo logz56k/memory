@@ -9,9 +9,10 @@ Raspberry Pi but also works on desktop systems.
 python3 SynthLAN.py --low 1024 --medium 10240 --high 51200
 ```
 
-The script expects WAV files in the `assets` directory. Because binary
-files are not stored in the repository, each sample is provided as a
-`[filename].wav.txt` file containing base64 data. Convert these text
-files back into `.wav` files before running SynthLAN. Use the
+Place MP3 files in the `assets` directory with the following names:
+`low.mp3`, `medium.mp3`, `high.mp3`, and `error.mp3`. Binary media is not
+tracked, so add your own tracks before running SynthLAN. Use the
 `--no-audio` option if no audio device is available or you only want to
-see the terminal meter.
+see the terminal meter. Network levels are averaged over the last ten
+seconds so songs change based on sustained trends rather than instant
+spikes.
