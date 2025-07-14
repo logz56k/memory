@@ -1,6 +1,6 @@
 # Brat OS Bootloader
 
-This directory contains a minimal 16-bit x86 boot sector that prints a brat-themed welcome message and waits for the user to type **`vroom`**. If the input matches, a success message is shown; otherwise it asks again.
+This directory contains a minimal 16-bit x86 boot sector with a brat-themed command shell. After showing a welcome message it prompts for commands such as **`whoami`**, **`yeet <file>`**, **`leak`**, and **`momplease`**.
 
 ## Building
 
@@ -21,4 +21,4 @@ You can test the bootloader with an emulator such as QEMU:
 qemu-system-i386 -fda brat_boot.bin
 ```
 
-It will display the welcome text in bright green and prompt for input.
+It will display the welcome text in bright green and then a `brat>` prompt where you can type commands.
