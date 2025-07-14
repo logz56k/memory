@@ -1,6 +1,6 @@
 # Brat OS Bootloader
 
-This directory contains a minimal 16-bit x86 boot sector with a brat-themed command shell. After showing a welcome message it prompts for commands such as **`whoami`**, **`yeet <file>`**, **`leak`**, and **`momplease`**.
+This directory contains a tiny 16-bit x86 boot sector that shows off some brat vibes in VGA graphics mode.  It switches to mode 13h (320x200x256), blinks a bright green "BRAT MODE \xf0\x9f\xa7\x83\xf0\x9f\x92\x9a" title, draws a hot pink heart in the middle of the screen and then waits for a key.  After a key press it drops back to text mode and prints "okay fine, we back \xf0\x9f\x99\x84".
 
 ## Building
 
@@ -21,4 +21,4 @@ You can test the bootloader with an emulator such as QEMU:
 qemu-system-i386 -fda brat_boot.bin
 ```
 
-It will display the welcome text in bright green and then a `brat>` prompt where you can type commands.
+You'll see a blinking "BRAT MODE" banner and a pink heart before it returns to text mode.
